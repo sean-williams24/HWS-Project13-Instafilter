@@ -86,7 +86,7 @@
                     </view>
                     <navigationItem key="navigationItem" id="GDH-ft-ZWj"/>
                     <connections>
-                        <outlet property="imageView" destination="01y-Cu-x2c" id="oef-zG-aTw"/>
+                        <outlet property="imageViewer" destination="01y-Cu-x2c" id="oef-zG-aTw"/>
                         <outlet property="intensity" destination="Z3O-4O-aaK" id="Ugk-QU-9c0"/>
                     </connections>
                 </viewController>
