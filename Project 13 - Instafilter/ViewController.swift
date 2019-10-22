@@ -26,6 +26,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "Instafilter"
+        imageViewer.alpha = 0
         changeFilterButton.setTitle("CHANGE FILTER", for: .normal)
 
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(importPicture))
@@ -88,6 +89,11 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         if let cgImage = context.createCGImage(outputImage, from: outputImage.extent) {
             let processedImage = UIImage(cgImage: cgImage)
             self.imageViewer.image = processedImage
+            UIView.animate(withDuration: 6, delay: 1, options: .curveLinear, animations: {
+                self.imageViewer.alpha = 1
+            }) { (fin) in
+                
+            }
         }
     }
     
