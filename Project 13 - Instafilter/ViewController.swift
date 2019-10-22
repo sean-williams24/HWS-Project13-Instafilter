@@ -13,6 +13,11 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     
     @IBOutlet var imageViewer: UIImageView!
     @IBOutlet var intensity: UISlider!
+    @IBOutlet var radius: UISlider!
+    @IBOutlet var scale: UISlider!
+    
+    
+    @IBOutlet var changeFilterButton: UIButton!
     
     var currentImage: UIImage!
     var context: CIContext!
@@ -21,6 +26,8 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "Instafilter"
+        changeFilterButton.setTitle("CHANGE FILTER", for: .normal)
+
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(importPicture))
         
         context = CIContext()
@@ -56,6 +63,9 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         // safely read the alert action's title
         guard let actionTitle = action.title else { return }
         
+        print(actionTitle)
+        let editedTitle = actionTitle.replacingOccurrences(of: "CI", with: "")
+        changeFilterButton.setTitle(editedTitle.uppercased(), for: .normal)
         currentFilter = CIFilter(name: actionTitle)
         
         let beginImage = CIImage(image: currentImage)
@@ -68,8 +78,8 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         let inputKeys = currentFilter.inputKeys
         
         if inputKeys.contains(kCIInputIntensityKey) { currentFilter.setValue(intensity.value, forKey: kCIInputIntensityKey) }
-        if inputKeys.contains(kCIInputRadiusKey) { currentFilter.setValue(intensity.value * 200, forKey: kCIInputRadiusKey) }
-        if inputKeys.contains(kCIInputScaleKey) { currentFilter.setValue(intensity.value * 10, forKey: kCIInputScaleKey) }
+        if inputKeys.contains(kCIInputRadiusKey) { currentFilter.setValue(radius.value * 200, forKey: kCIInputRadiusKey) }
+        if inputKeys.contains(kCIInputScaleKey) { currentFilter.setValue(scale.value * 10, forKey: kCIInputScaleKey) }
         if inputKeys.contains(kCIInputCenterKey) { currentFilter.setValue(CIVector(x: currentImage.size.width / 2, y: currentImage.size.height / 2), forKey: kCIInputCenterKey) }
         
         guard let outputImage = currentFilter.outputImage else { return }
@@ -109,14 +119,19 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
             popoverController.sourceView = sender
             popoverController.sourceRect = sender.bounds
         }
-
+        
         present(ac, animated: true)
     }
     
     @IBAction func save(_ sender: Any) {
-        guard let image = imageViewer.image else { return }
+        if let image = imageViewer.image {
+            UIImageWriteToSavedPhotosAlbum(image, self, #selector(image(_:didFinishSavingWithError:contextInfo:)), nil)
+        } else {
+            let ac = UIAlertController(title: "OOPS", message: "You need to edit an image before attempting ot save!", preferredStyle: .alert)
+            ac.addAction(UIAlertAction(title: "OK", style: .default))
+            present(ac, animated: true)
+        }
         
-        UIImageWriteToSavedPhotosAlbum(image, self, #selector(image(_:didFinishSavingWithError:contextInfo:)), nil)
     }
     
     @IBAction func intensityChange(_ sender: Any) {
